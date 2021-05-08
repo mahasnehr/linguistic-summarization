@@ -7,7 +7,4 @@ In this work we propose a data-driven approach based on NN, without relying heav
 
 
 ## Problem Formulation
-The summarization tasks considered in this project is when gven a document D consisting of a sequence of sentences
-{s1,··· ,sm} and a word set {w1,··· ,wn}, we are
-interested in obtaining summaries at two levels of
-granularity, namely sentences and words and eventually match each document with its related title.
+The model was trained on amazon food review data corpora containing thousands of reviews-summary pairs. The summarization tasks considered in this project is when given a Text consisting of a sequence of sentences. We are interested in obtaining the best abstract for summaries considering context and sentiment of the review.
