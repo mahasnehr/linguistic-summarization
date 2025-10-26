@@ -26,3 +26,10 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import mean_absolute_error
+import seaborn as sns
+import matplotlib.pyplot as plt
+plt.style.use('Solarize_Light2')
+nltk.download('stopwords')
+#data = pd.read_csv("train-sent.csv")
+data = pd.read_csv("trainfinal02.csv")
+data
