@@ -7,7 +7,7 @@ In this work we propose a data-driven approach based on NN, without relying heav
 
 
 ## Problem Formulation
-The model was trained on amazon food review data corpora containing thousands of reviews-summary pairs. The summarization tasks considered in this project is when given a Text consisting of a sequence of sentences. We are interested in obtaining the best abstract for summaries considering context and sentiment of the review.
+Humans express their emotions by words. Emotion analysis is a method to identify emotional status. Emotion Distribution Learning (EDL) translates human emotions by considering multiple intensities conveyed in data. Gen-erally, emotion detection is more complex than just labeling it under six cate-gories: love, fear, joy, sadness, surprise and anger. Indeed, capturing the in-herent uncertainty and vagueness of human emotions is a complex task as presented in Plutchik wheel of emotions. In this paper we propose a novel emotion classification (analysis) framework; the Fuzzy Signature Emotion Classification (FSEC) model. FSEC facilitates Fuzzy Signature (FSig) to dy-namically conduct structural trees depending on the Plutchik wheel of emo-tions, integrated with the classical EDL approach to enhance (to some extent) the classical emotion classification methods. 
 
 ## Note:
 to run this model Please change "Summary" to "abstract" in Amazon review Dataset
