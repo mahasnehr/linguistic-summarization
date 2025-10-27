@@ -1,11 +1,8 @@
-the orginal tweets Dataset can be donwloaded and found at the below links
-
-
+1= the orginal tweets Dataset can be donwloaded and found at the below links
 https://www.kaggle.com/datasets/aadyasingh55/twitter-emotion-classification-dataset?resource=download 
-
 https://www.kaggle.com/code/anmatngu/classifying-emotions-in-tweets-with-basic-nlp 
 
-THE NEWELY GENERATED DATASET AFTER APPLYING the Fuzzy Signature Emotion Classification (FSEC) model CAN BE DOWNLOADED FROM HERE 
+2-THE NEWELY GENERATED DATASET AFTER APPLYING the Fuzzy Signature Emotion Classification (FSEC) model CAN BE DOWNLOADED FROM HERE 
 Part01.zip and Part02.zip it was splitted due to size limitation 
 
 
