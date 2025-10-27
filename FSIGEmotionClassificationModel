@@ -1,1 +1,104 @@
+import pandas as pd
+from nltk.corpus import stopwords
+from nltk.stem.wordnet import WordNetLemmatizer
+import string
+from textblob.classifiers import NaiveBayesClassifier
+from textblob import TextBlob
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from textblob import Word
+from nltk.util import ngrams
+import re
+from nltk.tokenize import word_tokenize
+import matplotlib.pyplot as plt
+from sklearn.feature_extraction.text import CountVectorizer,TfidfVectorizer
+from sklearn.decomposition import LatentDirichletAllocation
+import sklearn.feature_extraction.text as text
+from sklearn.decomposition import NMF, LatentDirichletAllocation, TruncatedSVD
+from sklearn import model_selection, preprocessing, linear_model, naive_bayes, metrics, svm
+import xgboost
+from sklearn import decomposition, ensemble
+import pandas, numpy, textblob, string
+import re
+import nltk
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import mean_absolute_error
+import seaborn as sns
+import matplotlib.pyplot as plt
+plt.style.use('Solarize_Light2')
+nltk.download('stopwords')
+#data = pd.read_csv("train-sent.csv")
+data = pd.read_csv("trainfinal3.csv") # change the name of the Dataset after downloading the files from gihub link 
+data
+data["love-ATA"].value_counts()
+copy = data.copy()
+data.head()
+data[["Tweet"]]
+#convert uppercase letters to lower case
+data['Tweet'] = data['Tweet'].apply(lambda x: " ".join(x.lower() for x in x.split()))
+#remove white spaces and special characters
+data['Tweet'] = data['Tweet'].str.replace('[^\w\s]','')
+data[["Tweet"]].head()
+stop = stopwords.words("english")
+data["Tweet"] = data["Tweet"].apply(lambda x: " ".join(x for x in x.split() if x not in stop))
+data[["Tweet"]].head()
+# data["content"] = data["content"].apply(lambda x: str(TextBlob(x).correct()))
+data[["Tweet"]].head()
+st = PorterStemmer()
+data["Tweet"] = data["Tweet"].apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
+data[["Tweet"]].head()
+data["love-ATA"].value_counts()
+
+le = preprocessing.LabelEncoder()
+data["love-ATA"] = le.fit_transform(data["love-ATA"])
+mapper = {i:le.classes_[i] for i in range(len(le.classes_))}
+mapper
+data["love-ATA"].value_counts()
+X_train, X_test, y_train, y_test = model_selection.train_test_split(data["Tweet"], data["love-ATA"], test_size=0.2, random_state=42, stratify=data["love-ATA"])
+cv = CountVectorizer()
+cv.fit(data["Tweet"])
+
+cv_xtrain = cv.transform(X_train)
+cv_xtest = cv.transform(X_test)
+tv = TfidfVectorizer()
+tv.fit(data["Tweet"])
+
+tv_xtrain = tv.transform(X_train)
+tv_xtest = tv.transform(X_test)
+def build(model_initializer, independant_variables_train,target ,independant_variables_test, target_test) :
+    model = model_initializer
+    model.fit(independant_variables_train,target)
+    prediction = model.predict(independant_variables_test)
+    return metrics.accuracy_score(prediction, target_test)
+
+# for CV
+output = build(linear_model.LogisticRegression(), cv_xtrain, y_train, cv_xtest, y_test)
+linear_classifier_count_acc= output
+print(output)
+# for TF-IDF
+output = build(linear_model.LogisticRegression(), tv_xtrain, y_train, tv_xtest , y_test)
+linear_classifier_tfidf_acc = output
+print(output)
+
+
+#LRG above
+classifier = linear_model.LogisticRegression().fit(tv_xtrain, y_train)
+val_predictions = classifier.predict(tv_xtest)
+
+# Precision , Recall , F1 - score , Support
+y_true, y_pred = y_test, val_predictions
+print(classification_report(y_true, y_pred))
+
+
+
+conf_mat = confusion_matrix(y_true, y_pred)
+fig, ax = plt.subplots(figsize=(10,10))
+sns.heatmap(conf_mat, annot=True, fmt='d',
+            xticklabels=le.classes_, yticklabels=le.classes_)
+plt.ylabel('Actual')
+plt.xlabel('Predicted')
+plt.show()
+
 
