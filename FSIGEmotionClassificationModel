@@ -101,4 +101,69 @@ plt.ylabel('Actual')
 plt.xlabel('Predicted')
 plt.show()
 
+### code for the apper ends here the other classifiers below are optional 
+
+
+#for cv
+####output = build(svm.SVC(), cv_xtrain, y_train, cv_xtest, y_test)
+####svm_count_acc = output
+####print(output)
+
+#for TF-IDF
+####output = build(svm.SVC(), tv_xtrain, y_train, tv_xtest, y_test)
+####svm_tfidf_acc = output
+####print(output)
+
+
+#for CV
+####output = build(ensemble.RandomForestClassifier(), cv_xtrain, y_train, cv_xtest, y_test)
+####print(output)
+####random_forest_count_acc = output
+#for TF-IDF
+####output = build(ensemble.RandomForestClassifier(), tv_xtrain, y_train, tv_xtest, y_test)
+####random_forest_tfidf_acc = output
+####print(output)
+
+
+# for CV
+####output = build(naive_bayes.MultinomialNB(), cv_xtrain, y_train  , cv_xtest, y_test)
+####naive_bayes_count_acc = output
+####print(output)
+# for TF-IDF
+####output = build(naive_bayes.MultinomialNB(), tv_xtrain, y_train, tv_xtest, y_test)
+####naive_bayes_tfidf_acc = output
+####print(output)
+
+
+####dictionary = {
+   #### 'algorithm': ['Naive Bayes', 'Naive Bayes', 'Linear Classifier', 'Linear Classifier', 'SVM', 'SVM', 'Random Forest', 'Random Forest'],
+   #### 'feature_engineering': ['Count Vector', 'TF-IDF Vector', 'Count Vector', 'TF-IDF Vector', 'Count Vector', 'TF-IDF Vector', 'Count Vector', 'TF-IDF Vector'],
+   #### 'accuracy': [naive_bayes_count_acc, naive_bayes_tfidf_acc, linear_classifier_count_acc, linear_classifier_tfidf_acc, svm_count_acc, svm_tfidf_acc, random_forest_count_acc, random_forest_tfidf_acc]
+####}
+
+# Create a DataFrame
+####df = pd.DataFrame(dictionary)
+
+# Display the DataFrame
+####df
+
+####classifier = svm.SVC().fit(tv_xtrain, y_train)
+####val_predictions = classifier.predict(tv_xtest)
+
+# Precision , Recall , F1 - score , Support
+####y_true, y_pred = y_test, val_predictions
+####print(classification_report(y_true, y_pred))
+
+
+####conf_mat = confusion_matrix(y_true, y_pred)
+####fig, ax = plt.subplots(figsize=(10,10))
+####sns.heatmap(conf_mat, annot=True, fmt='d',
+            xticklabels=le.classes_, yticklabels=le.classes_)
+####plt.ylabel('Actual')
+####plt.xlabel('Predicted')
+####plt.show()
+
+
+#### end of classifier comparision
+
 
