@@ -25,14 +25,21 @@ from sklearn.metrics import classification_report
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import mean_absolute_error
+
+
 import seaborn as sns
 import matplotlib.pyplot as plt
 plt.style.use('Solarize_Light2')
+
+
+
 nltk.download('stopwords')
+
 #data = pd.read_csv("train-sent.csv")
-data = pd.read_csv("trainfinal3.csv") # change the name of the Dataset after downloading the files from gihub link 
+data = pd.read_csv("OptimisimDS.csv") # change the name of the Dataset after downloading the files from gihub link
 data
-data["love-ATA"].value_counts()
+
+data["Optimism"].value_counts()
 copy = data.copy()
 data.head()
 data[["Tweet"]]
@@ -40,7 +47,6 @@ data[["Tweet"]]
 data['Tweet'] = data['Tweet'].apply(lambda x: " ".join(x.lower() for x in x.split()))
 #remove white spaces and special characters
 data['Tweet'] = data['Tweet'].str.replace('[^\w\s]','')
-data[["Tweet"]].head()
 stop = stopwords.words("english")
 data["Tweet"] = data["Tweet"].apply(lambda x: " ".join(x for x in x.split() if x not in stop))
 data[["Tweet"]].head()
@@ -49,14 +55,16 @@ data[["Tweet"]].head()
 st = PorterStemmer()
 data["Tweet"] = data["Tweet"].apply(lambda x: " ".join([st.stem(word) for word in x.split()]))
 data[["Tweet"]].head()
-data["love-ATA"].value_counts()
+data["Optimism"].value_counts()
 
 le = preprocessing.LabelEncoder()
-data["love-ATA"] = le.fit_transform(data["love-ATA"])
+data["Optimism"] = le.fit_transform(data["Optimism"])
 mapper = {i:le.classes_[i] for i in range(len(le.classes_))}
 mapper
-data["love-ATA"].value_counts()
-X_train, X_test, y_train, y_test = model_selection.train_test_split(data["Tweet"], data["love-ATA"], test_size=0.2, random_state=42, stratify=data["love-ATA"])
+data["Optimism"].value_counts()
+X_train, X_test, y_train, y_test = model_selection.train_test_split(data["Tweet"], data["Optimism"], test_size=0.2, random_state=42, stratify=data["Optimism"])
+
+
 cv = CountVectorizer()
 cv.fit(data["Tweet"])
 
@@ -73,6 +81,8 @@ def build(model_initializer, independant_variables_train,target ,independant_var
     prediction = model.predict(independant_variables_test)
     return metrics.accuracy_score(prediction, target_test)
 
+
+
 # for CV
 output = build(linear_model.LogisticRegression(), cv_xtrain, y_train, cv_xtest, y_test)
 linear_classifier_count_acc= output
@@ -81,6 +91,7 @@ print(output)
 output = build(linear_model.LogisticRegression(), tv_xtrain, y_train, tv_xtest , y_test)
 linear_classifier_tfidf_acc = output
 print(output)
+
 
 
 #LRG above
@@ -100,4 +111,6 @@ sns.heatmap(conf_mat, annot=True, fmt='d',
 plt.ylabel('Actual')
 plt.xlabel('Predicted')
 plt.show()
+
+
 
