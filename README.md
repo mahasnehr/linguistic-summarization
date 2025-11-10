@@ -1,4 +1,4 @@
-# Emotion Label Enhancement with Fuzzy Signature Inference System
+# Intuitionistic Fuzzy Approach for Emotion Analysis Enhancement
 In this work we propose a data-driven approach based on NN, without relying heavily on human help. We will develop a general framework for single-document summarization. We will train the models on large scale corpora containing thousands of document-summary pairs. 
 
 ## Author : Ruba ALMahasneh 
@@ -7,7 +7,7 @@ In this work we propose a data-driven approach based on NN, without relying heav
 
 
 ## Problem Formulation
-Humans express their emotions by words. Emotion analysis is a method to identify emotional status. Emotion Distribution Learning (EDL) translates human emotions by considering multiple intensities conveyed in data. Gen-erally, emotion detection is more complex than just labeling it under six cate-gories: love, fear, joy, sadness, surprise and anger. Indeed, capturing the in-herent uncertainty and vagueness of human emotions is a complex task as presented in Plutchik wheel of emotions. In this paper we propose a novel emotion classification (analysis) framework; the Fuzzy Signature Emotion Classification (FSEC) model. FSEC facilitates Fuzzy Signature (FSig) to dy-namically conduct structural trees depending on the Plutchik wheel of emo-tions, integrated with the classical EDL approach to enhance (to some extent) the classical emotion classification methods. 
+In this study, we introduced a novel intuitionisitic fuzzy-based approach to classify emotions derived from Plutchik wheel of emotions. The Intuitionistic Fuzzy Set Emotion Classification (IFSEC) was illustrated on love as a complex emotion (derived from the combination of six key sub-emotions: serenity, joy, ecstasy, acceptance, trust, and admiration). Using intuitionisitic fuzzy sets, we captured the overlapping nature of these emotions in textual data, allowing smooth transitions between different levels of emotional intensity. Then we extended the model (IFSEC) using Mamdani inference system and aggregated different tree structures (observations) where each instance modeled emotions (love emotion in particular) slightly different on the emotions spectrum. Finally, the model was utilized to generate a labeled dataset and tested on Recurrent Neural Networks model for emotion detection. IFSEC exhibits the ability in capturing the inherent ambiguity and variability in emotional states and improves the accuracy of emotion labeling. We are eager to expand this model for future applications in sentiment analysis and psychological studies where accurately understanding emotional states is vital. 
 
 ## Note:
 to run this model Please:
