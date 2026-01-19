@@ -13,7 +13,7 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.preprocessing.text import Tokenizer
 import re
-# Load Data
+# Load Data FSEA Dataset
 df = pd.read_csv('emotions8.csv')
 # Drop rows where the 'label' column has NaN values
 df.dropna(subset=['label'], inplace=True)
