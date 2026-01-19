@@ -72,7 +72,18 @@ model.compile(loss="sparse_categorical_crossentropy",
 model.build(input_shape=(None, max_len))
 model.summary()
 
-
+from tensorflow.keras.callbacks import EarlyStopping
+# 3. Configure Early Stopping Callback
+# monitor='val_loss': Tracks the loss on the validation set.
+# patience=3: Waits for 3 epochs with no improvement before stopping.
+# restore_best_weights=True: Loads the model weights from the epoch with the best validation score.
+early_stop = EarlyStopping(
+    monitor='val_loss', 
+    patience=3, 
+    verbose=1, # Prints a message when stopping
+    mode='min', # Expects validation loss to decrease
+    restore_best_weights=True 
+)
 #Train Model
 history = model.fit(
     X_train, y_train,
