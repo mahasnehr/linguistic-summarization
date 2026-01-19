@@ -71,3 +71,59 @@ model.compile(loss="sparse_categorical_crossentropy",
 
 model.build(input_shape=(None, max_len))
 model.summary()
+
+
+#Train Model
+history = model.fit(
+    X_train, y_train,
+    validation_data=(X_val, y_val),
+    epochs=10,
+    batch_size=64,
+    verbose=1
+)
+#Evaluate Model
+loss, acc = model.evaluate(X_test, y_test, verbose=0)
+print(f"Test Accuracy: {acc*100:.2f}%")
+# Classification report
+y_pred = model.predict(X_test)
+y_pred_classes = np.argmax(y_pred, axis=1)
+
+print("\nClassification Report:\n")
+print(classification_report(y_test, y_pred_classes, target_names=label_encoder.classes_))
+
+# Confusion Matrix
+cm = confusion_matrix(y_test, y_pred_classes)
+plt.figure(figsize=(7,5))
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
+            xticklabels=label_encoder.classes_,
+            yticklabels=label_encoder.classes_)
+plt.xlabel("Predicted")
+plt.ylabel("True")
+plt.title("Confusion Matrix")
+plt.show()
+
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+def predict_emotion(text):
+    # Convert text to sequence
+    seq = tokenizer.texts_to_sequences([text])
+    padded = pad_sequences(seq, maxlen=max_len)
+
+    # Predict using your trained model
+    pred = model.predict(padded)
+
+    # Get label
+    label = label_encoder.inverse_transform([np.argmax(pred)])
+    return label[0], pred[0]
+
+sample_texts = [
+    "I am feeling very happy today!",
+    "This makes me so angry!",
+    "I’m scared of what will happen tomorrow",
+    "what to hell are you doing?",
+    "I feel really sad and hopeless",
+]
+
+for txt in sample_texts:
+    emotion, scores = predict_emotion(txt)
+    print(f"Text: {txt}\nPredicted Emotion: {emotion}\n")
