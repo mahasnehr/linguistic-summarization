@@ -1,1 +1,158 @@
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt
+import seaborn as sns
+# Word Cloud
+from wordcloud import WordCloud
+# from textacy import preprocessing
+from nltk.stem.snowball import SnowballStemmer
+from keras.preprocessing import sequence
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import *
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.text import Tokenizer
+import re
+# Load Data
+df = pd.read_csv('emotions8.csv')
+# Drop rows where the 'label' column has NaN values
+df.dropna(subset=['label'], inplace=True)
+df.head()
 
+# Shape Of Data
+print(f'The Shape Of Data Is : {df.shape}')
+
+# Null Values
+df.isnull().sum()
+
+# Duplicates
+df.duplicated().sum()
+
+# Rename Columns
+df.rename(columns={'text': 'Text', 'label': 'Label'}, inplace=True)
+# Dropping the Index Colums
+#df.drop('Unnamed: 0',axis=1,inplace=True)
+
+# Head Of Data
+df.head()
+
+# Lets Rename Label also {0: '0', 1: '1', 2: '2', 3: '3', 4: '4', 5: '5', 6: '6', 7: '7', 8: '8'}
+df['Label'] = df['Label'].replace(1.0,'1')
+df['Label'] = df['Label'].replace(2.0,'2')
+df['Label'] = df['Label'].replace(3.0,'3')
+df['Label'] = df['Label'].replace(4.0,'4')
+df['Label'] = df['Label'].replace(5.0,'5')
+df['Label'] = df['Label'].replace(6.0,'6')
+df['Label'] = df['Label'].replace(7.0,'7')
+df['Label'] = df['Label'].replace(8.0,'8')
+
+# Value Count Of Label
+count = df['Label'].value_counts()
+
+# Create a figure with two subplots
+fig, axs = plt.subplots(1, 2, figsize=(12, 6), facecolor='white')
+
+# Plot pie chart on the first subplot
+palette = sns.color_palette("viridis")
+sns.set_palette(palette)
+axs[0].pie(count, labels=count.index, autopct='%1.1f%%', startangle=140)
+axs[0].set_title('Distribution of Categories')
+
+# Plot bar chart on the second subplot
+sns.barplot(x=count.index, y=count.values, ax=axs[1], palette="viridis")
+axs[1].set_title('Count of Categories')
+
+# Adjust layout
+plt.tight_layout()
+
+# Show the plot
+plt.show()
+
+# Make Seperate Data Set to Visualize text
+# 1
+df_1 = df[df['Label']=='1']
+# 2
+df_2 = df[df['Label']=='2']
+# 3
+df_3 = df[df['Label']=='3']
+# 4
+df_4 = df[df['Label']=='4']
+# 5
+df_5 = df[df['Label']=='5']
+# 6
+df_6 = df[df['Label']=='6']
+# 7
+df_7 = df[df['Label']=='7']
+# 8
+df_8 = df[df['Label']=='8']
+
+
+# Combine text from different categories
+combined_1_text = ' '.join(df_1['Text'])
+combined_2_text = ' '.join(df_2['Text'])
+combined_3_text = ' '.join(df_3['Text'])
+combined_4_text = ' '.join(df_4['Text'])
+combined_5_text = ' '.join(df_5['Text'])
+combined_6_text = ' '.join(df_6['Text'])
+combined_7_text = ' '.join(df_7['Text'])
+combined_8_text = ' '.join(df_8['Text'])
+
+print(combined_1_text[1000])
+# Create word clouds
+#1_wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_1_text)
+
+
+wordcloud1 = WordCloud(width=800, height=400, background_color='white').generate(combined_1_text)
+wordcloud2 = WordCloud(width=800, height=400, background_color='white').generate(combined_2_text)
+wordcloud3 = WordCloud(width=800, height=400, background_color='white').generate(combined_3_text)
+wordcloud4 = WordCloud(width=800, height=400, background_color='white').generate(combined_4_text)
+wordcloud5 = WordCloud(width=800, height=400, background_color='white').generate(combined_5_text)
+wordcloud6 = WordCloud(width=800, height=400, background_color='white').generate(combined_6_text)
+wordcloud7 = WordCloud(width=800, height=400, background_color='white').generate(combined_7_text)
+wordcloud8 = WordCloud(width=800, height=400, background_color='white').generate(combined_8_text)
+
+# Plot the word clouds
+plt.figure(figsize=(18, 9))
+
+plt.subplot(2, 3, 1)
+plt.imshow(wordcloud1, interpolation='bilinear')
+plt.title('1')
+plt.axis('off')
+
+plt.subplot(2, 3, 2)
+plt.imshow(wordcloud2, interpolation='bilinear')
+plt.title('2')
+plt.axis('off')
+
+plt.subplot(2, 3, 3)
+plt.imshow(wordcloud3, interpolation='bilinear')
+plt.title('3')
+plt.axis('off')
+
+plt.subplot(2, 3, 4)
+plt.imshow(wordcloud4, interpolation='bilinear')
+plt.title('4')
+plt.axis('off')
+
+plt.subplot(2, 3, 5)
+plt.imshow(wordcloud5, interpolation='bilinear')
+plt.title('5')
+plt.axis('off')
+
+plt.subplot(2, 3, 6)
+plt.imshow(wordcloud6, interpolation='bilinear')
+plt.title('6')
+plt.axis('off')
+
+plt.subplot(2, 3, 7)
+plt.imshow(wordcloud7, interpolation='bilinear')
+plt.title('7')
+plt.axis('off')
+
+plt.subplot(2, 3, 8)
+plt.imshow(wordcloud8, interpolation='bilinear')
+plt.title('8')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
