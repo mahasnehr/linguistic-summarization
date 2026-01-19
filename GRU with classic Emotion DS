@@ -294,5 +294,36 @@ model.summary()
 history = model.fit(X_train_padded, y_train, epochs=5, batch_size=1500, validation_data=(X_test_padded, y_test))
 
 
+# Get the epoch with the highest validation accuracy
+best_epoch = history.history['val_accuracy'].index(max(history.history['val_accuracy'])) + 1
+
+# Create a subplot with 1 row and 2 columns
+fig, axs = plt.subplots(1, 2, figsize=(16, 5))
+
+# Plot training and validation accuracy
+axs[0].plot(history.history['accuracy'], label='Training Accuracy', color='blue')
+axs[0].plot(history.history['val_accuracy'], label='Validation Accuracy', color='red')
+axs[0].scatter(best_epoch - 1, history.history['val_accuracy'][best_epoch - 1], color='green', label=f'Best Epoch: {best_epoch}')
+axs[0].set_xlabel('Epoch')
+axs[0].set_ylabel('Accuracy')
+axs[0].set_title('Training and Validation Accuracy')
+axs[0].legend()
+
+
+# Plot training and validation loss
+axs[1].plot(history.history['loss'], label='Training Loss', color='blue')
+axs[1].plot(history.history['val_loss'], label='Validation Loss', color='red')
+axs[1].scatter(best_epoch - 1, history.history['val_loss'][best_epoch - 1], color='green',label=f'Best Epoch: {best_epoch}')
+axs[1].set_xlabel('Epoch')
+axs[1].set_ylabel('Loss')
+axs[1].set_title('Training and Validation Loss')
+axs[1].legend()
+
+plt.tight_layout()
+plt.show()
+
+
+
+
 
 
