@@ -102,57 +102,205 @@ print(combined_1_text[1000])
 #1_wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_1_text)
 
 
-wordcloud1 = WordCloud(width=800, height=400, background_color='white').generate(combined_1_text)
-wordcloud2 = WordCloud(width=800, height=400, background_color='white').generate(combined_2_text)
-wordcloud3 = WordCloud(width=800, height=400, background_color='white').generate(combined_3_text)
-wordcloud4 = WordCloud(width=800, height=400, background_color='white').generate(combined_4_text)
-wordcloud5 = WordCloud(width=800, height=400, background_color='white').generate(combined_5_text)
-wordcloud6 = WordCloud(width=800, height=400, background_color='white').generate(combined_6_text)
-wordcloud7 = WordCloud(width=800, height=400, background_color='white').generate(combined_7_text)
-wordcloud8 = WordCloud(width=800, height=400, background_color='white').generate(combined_8_text)
+# Now Unrename Label again
+# Note: This block now explicitly remaps labels based on unique values found in the 'Label' column.
+# The previous individual `replace` calls have been replaced by a more robust mapping approach.
 
-# Plot the word clouds
-plt.figure(figsize=(18, 9))
+# Get unique sorted labels
+unique_labels = sorted(df['Label'].dropna().unique())
+# Create a mapping from old labels to new 0-indexed labels
+label_mapping = {label: i for i, label in enumerate(unique_labels)}
+df['Label'] = df['Label'].map(label_mapping)
 
-plt.subplot(2, 3, 1)
-plt.imshow(wordcloud1, interpolation='bilinear')
-plt.title('1')
-plt.axis('off')
 
-plt.subplot(2, 3, 2)
-plt.imshow(wordcloud2, interpolation='bilinear')
-plt.title('2')
-plt.axis('off')
+# Import Basis Needed Libaries
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
 
-plt.subplot(2, 3, 3)
-plt.imshow(wordcloud3, interpolation='bilinear')
-plt.title('3')
-plt.axis('off')
+# Download NLTK resources (uncomment the following line if not already downloaded)?
+nltk.download('punkt')
+nltk.download('stopwords')
 
-plt.subplot(2, 3, 4)
-plt.imshow(wordcloud4, interpolation='bilinear')
-plt.title('4')
-plt.axis('off')
 
-plt.subplot(2, 3, 5)
-plt.imshow(wordcloud5, interpolation='bilinear')
-plt.title('5')
-plt.axis('off')
+# Step 1: Remove URLs
+df['Text'] = df['Text'].str.replace(r'http\S+', '', regex=True)
 
-plt.subplot(2, 3, 6)
-plt.imshow(wordcloud6, interpolation='bilinear')
-plt.title('6')
-plt.axis('off')
+# Display the first few rows of the DataFrame to verify the changes
+print(df.head())
 
-plt.subplot(2, 3, 7)
-plt.imshow(wordcloud7, interpolation='bilinear')
-plt.title('7')
-plt.axis('off')
 
-plt.subplot(2, 3, 8)
-plt.imshow(wordcloud8, interpolation='bilinear')
-plt.title('8')
-plt.axis('off')
+# Step 2: Remove special characters and punctuation
+df['Text'] = df['Text'].str.replace(r'[^\w\s]', '', regex=True)
+
+# Display the first few rows of the DataFrame to verify the changes
+print(df.head())
+
+
+
+# Step 3: Remove extra whitespaces
+df['Text'] = df['Text'].str.replace(r'\s+', ' ', regex=True)
+
+# Display the first few rows of the DataFrame to verify the changes
+print(df.head())
+
+
+
+# Step : 4 Remove numeric values
+df['Text'] = df['Text'].str.replace(r'\d+', '', regex=True)
+
+# Head
+df.head()
+
+
+
+# Step 6: Lowercasing
+df['Text'] = df['Text'].str.lower()
+
+# Display the first few rows of the DataFrame to verify the changes
+print(df.head())
+
+
+# Step 8: Remove stop words
+stop = stopwords.words('english')
+df["Text"] = df['Text'].apply(lambda x: ' '.join([word for word in x.split() if word not in (stop)]))
+
+# Display the first few rows of the DataFrame to verify the changes
+df.head()
+
+
+# Step : 9 Remove non-alphanumeric characters from the 'Text' column
+df['Text'] = df['Text'].apply(lambda x: re.sub(r'[^a-zA-Z\s]', '', x))
+
+# Display the first few rows of the DataFrame to verify the changes
+df.head()
+
+
+
+X = df['Text']
+y = df['Label']
+
+# Train Test Split
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Print the shapes of the training and testing sets
+print("X_train shape:", X_train.shape)
+print("X_test shape:", X_test.shape)
+print("y_train shape:", y_train.shape)
+print("y_test shape:", y_test.shape)
+
+
+
+# Tokenize the text data
+tokenizer = Tokenizer(num_words=50000)
+tokenizer.fit_on_texts(X_train)
+tokenizer.fit_on_texts(X_test)
+X_train_sequences = tokenizer.texts_to_sequences(X_train)
+X_test_sequences = tokenizer.texts_to_sequences(X_test)
+
+
+
+# Max Len in X_train_sequences
+maxlen = max(len(tokens) for tokens in X_train_sequences)
+print("Maximum sequence length (maxlen):", maxlen)
+
+
+# Perform padding on X_train and X_test sequences
+X_train_padded = pad_sequences(X_train_sequences, maxlen=maxlen, padding='post')
+X_test_padded = pad_sequences(X_test_sequences, maxlen=maxlen, padding='post')
+
+# Print the padded sequences for X_train and X_test
+print("X_train_padded:")
+print(X_train_padded)
+print("\nX_test_padded:")
+print(X_test_padded)
+
+
+# Embedding Input Size / Vocabulary Size
+input_Size = np.max(X_train_padded) + 1
+print(f"Input Size (Vocabulary Size): {input_Size}")
+
+
+# Define the model
+model = Sequential()
+
+# Add embedding layer
+model.add(Embedding(input_dim=input_Size, output_dim=50, input_length=maxlen))
+
+# Dropout
+model.add(Dropout(0.5))
+
+# Add Bidirectional LSTM layer
+model.add(Bidirectional(GRU(120, return_sequences=True)))
+model.add(Bidirectional(GRU(64, return_sequences=True)))
+#added
+model.add(GRU(units=64, return_sequences=True, dropout=0.3, recurrent_dropout=0.3))
+
+
+
+#Batch Normalization
+model.add(BatchNormalization())
+
+# Add Bidirectional GRU layer
+model.add(Bidirectional(GRU(64)))
+
+# Add output layer. The number of units should be equal to the number of unique labels after remapping.
+model.add(Dense(len(unique_labels), activation='softmax'))
+
+# Compile the model
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+# Print model summary
+model.summary()
+
+
+# Model Train
+history = model.fit(X_train_padded, y_train, epochs=5, batch_size=1500, validation_data=(X_test_padded, y_test))
+
+
+
+# Get the epoch with the highest validation accuracy
+best_epoch = history.history['val_accuracy'].index(max(history.history['val_accuracy'])) + 1
+
+# Create a subplot with 1 row and 2 columns
+fig, axs = plt.subplots(1, 2, figsize=(16,5))
+
+# Plot training and validation accuracy
+axs[0].plot(history.history['accuracy'], label='Training Accuracy', color='blue')
+axs[0].plot(history.history['val_accuracy'], label='Validation Accuracy', color='red')
+axs[0].scatter(best_epoch - 1, history.history['val_accuracy'][best_epoch - 1], color='green', label=f'Best Epoch: {best_epoch}')
+axs[0].set_xlabel('Epoch')
+axs[0].set_ylabel('Accuracy')
+axs[0].set_title('Training and Validation Accuracy')
+axs[0].legend()
+
+
+# Plot training and validation loss
+axs[1].plot(history.history['loss'], label='Training Loss', color='blue')
+axs[1].plot(history.history['val_loss'], label='Validation Loss', color='red')
+axs[1].scatter(best_epoch - 1, history.history['val_loss'][best_epoch - 1], color='green',label=f'Best Epoch: {best_epoch}')
+axs[1].set_xlabel('Epoch')
+axs[1].set_ylabel('Loss')
+axs[1].set_title('Training and Validation Loss')
+axs[1].legend()
 
 plt.tight_layout()
 plt.show()
+
+
+# Evaluate Test Data
+model.evaluate(X_test_padded, y_test)
+
+
+
+# Predictions On Test For Confustion Matrix
+from sklearn.metrics import confusion_matrix
+y_pred = model.predict(X_test_padded)
+y_pred = np.argmax(y_pred, axis=1)
+
+
+
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Reds')
+
+
