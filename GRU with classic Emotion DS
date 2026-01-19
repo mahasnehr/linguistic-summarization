@@ -1,1 +1,298 @@
 
+import numpy as np # linear algebra
+import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
+import matplotlib.pyplot as plt
+import seaborn as sns
+# Word Cloud
+from wordcloud import WordCloud
+# from textacy import preprocessing
+from nltk.stem.snowball import SnowballStemmer
+from keras.preprocessing import sequence
+from sklearn.model_selection import train_test_split
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import *
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+from tensorflow.keras.preprocessing.text import Tokenizer
+import re
+
+import os
+# Load Data
+df = pd.read_csv(os.path.join(nelgiriyewithana_emotions_path, 'text.csv'))
+df.head()
+
+# Shape Of Data 
+print(f'The Shape Of Data Is : {df.shape}')
+# Duplicates
+df.duplicated().sum()
+
+
+# Rename Columns 
+df.rename(columns={'text': 'Text', 'label': 'Label'}, inplace=True)
+# Dropping the Index Colums
+df.drop('Unnamed: 0',axis=1,inplace=True)
+
+
+# Head Of Data
+df.head()
+
+
+# Lets Rename Label also {0: 'sadness', 1: 'joy', 2: 'love', 3: 'anger', 4: 'fear', 5: 'surprise'}
+df['Label'] = df['Label'].replace(0,'Sadness')
+df['Label'] = df['Label'].replace(1,'Joy')
+df['Label'] = df['Label'].replace(2,'Love')
+df['Label'] = df['Label'].replace(3,'Anger')
+df['Label'] = df['Label'].replace(4,'Fear')
+df['Label'] = df['Label'].replace(5,'Surprise')
+
+
+# Value Count Of Label
+count = df['Label'].value_counts()
+
+# Create a figure with two subplots
+fig, axs = plt.subplots(1, 2, figsize=(12, 6), facecolor='white')
+
+# Plot pie chart on the first subplot
+palette = sns.color_palette("viridis")
+sns.set_palette(palette)
+axs[0].pie(count, labels=count.index, autopct='%1.1f%%', startangle=140)
+axs[0].set_title('Distribution of Categories')
+
+# Plot bar chart on the second subplot
+sns.barplot(x=count.index, y=count.values, ax=axs[1], palette="viridis")
+axs[1].set_title('Count of Categories')
+
+# Adjust layout
+plt.tight_layout()
+
+# Show the plot
+plt.show()
+
+
+
+# Make Seperate Data Set to Visualize text 
+# Sadness
+df_sadness = df[df['Label']=='Sadness']
+# Joy
+df_joy = df[df['Label']=='Joy']
+# Love
+df_love = df[df['Label']=='Love']
+# Anger
+df_anger = df[df['Label']=='Anger']
+# Fear
+df_fear = df[df['Label']=='Fear']
+# Surprise
+df_surprise = df[df['Label']=='Surprise']
+
+
+
+
+# Combine text from different categories
+combined_sadness_text = ' '.join(df_sadness['Text'])
+combined_joy_text = ' '.join(df_joy['Text'])
+combined_love_text = ' '.join(df_love['Text'])
+combined_anger_text = ' '.join(df_anger['Text'])
+combined_fear_text = ' '.join(df_fear['Text'])
+combined_surprise_text = ' '.join(df_surprise['Text'])
+
+# Create word clouds
+sadness_wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_sadness_text)
+joy_wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_joy_text)
+love_wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_love_text)
+anger_wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_anger_text)
+fear_wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_fear_text)
+surprise_wordcloud = WordCloud(width=800, height=400, background_color='white').generate(combined_surprise_text)
+
+# Plot the word clouds
+plt.figure(figsize=(18, 9))
+
+plt.subplot(2, 3, 1)
+plt.imshow(sadness_wordcloud, interpolation='bilinear')
+plt.title('Sadness Text')
+plt.axis('off')
+
+plt.subplot(2, 3, 2)
+plt.imshow(joy_wordcloud, interpolation='bilinear')
+plt.title('Joy Text')
+plt.axis('off')
+
+plt.subplot(2, 3, 3)
+plt.imshow(love_wordcloud, interpolation='bilinear')
+plt.title('Love Text')
+plt.axis('off')
+
+plt.subplot(2, 3, 4)
+plt.imshow(anger_wordcloud, interpolation='bilinear')
+plt.title('Anger Text')
+plt.axis('off')
+
+plt.subplot(2, 3, 5)
+plt.imshow(fear_wordcloud, interpolation='bilinear')
+plt.title('Fear Text')
+plt.axis('off')
+
+plt.subplot(2, 3, 6)
+plt.imshow(surprise_wordcloud, interpolation='bilinear')
+plt.title('Surprise Text')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+
+# Now Unrename Label again
+df['Label'] = df['Label'].replace('Sadness',0)
+df['Label'] = df['Label'].replace('Joy',1)
+df['Label'] = df['Label'].replace('Love',2)
+df['Label'] = df['Label'].replace('Anger',3)
+df['Label'] = df['Label'].replace('Fear',4)
+df['Label'] = df['Label'].replace('Surprise',5)
+
+
+
+# Import Basis Needed Libaries 
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+
+# Download NLTK resources (uncomment the following line if not already downloaded)?
+nltk.download('punkt')
+nltk.download('stopwords')
+
+
+
+# Step 1: Remove URLs
+df['Text'] = df['Text'].str.replace(r'http\S+', '', regex=True)
+
+# Display the first few rows of the DataFrame to verify the changes
+print(df.head())
+
+
+# Step 2: Remove special characters and punctuation
+df['Text'] = df['Text'].str.replace(r'[^\w\s]', '', regex=True)
+
+# Display the first few rows of the DataFrame to verify the changes
+print(df.head())
+
+
+
+# Step 3: Remove extra whitespaces
+df['Text'] = df['Text'].str.replace(r'\s+', ' ', regex=True)
+
+# Display the first few rows of the DataFrame to verify the changes
+print(df.head())
+
+
+
+
+# Step : 4 Remove numeric values
+df['Text'] = df['Text'].str.replace(r'\d+', '', regex=True)
+
+# Head
+df.head()
+
+
+
+# Step 6: Lowercasing
+df['Text'] = df['Text'].str.lower()
+
+# Display the first few rows of the DataFrame to verify the changes
+print(df.head())
+
+
+
+
+# Step 8: Remove stop words
+stop = stopwords.words('english')
+df["Text"] = df['Text'].apply(lambda x: ' '.join([word for word in x.split() if word not in (stop)]))
+
+# Display the first few rows of the DataFrame to verify the changes
+df.head()
+
+
+# Step : 9 Remove non-alphanumeric characters from the 'Text' column
+df['Text'] = df['Text'].apply(lambda x: re.sub(r'[^a-zA-Z\s]', '', x))
+
+# Display the first few rows of the DataFrame to verify the changes
+df.head()
+
+
+X = df['Text']
+y = df['Label']
+
+# Train Test Split 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Print the shapes of the training and testing sets
+print("X_train shape:", X_train.shape)
+print("X_test shape:", X_test.shape)
+print("y_train shape:", y_train.shape)
+print("y_test shape:", y_test.shape)
+
+
+# Tokenize the text data
+tokenizer = Tokenizer(num_words=50000)
+tokenizer.fit_on_texts(X_train)
+tokenizer.fit_on_texts(X_test)
+X_train_sequences = tokenizer.texts_to_sequences(X_train)
+X_test_sequences = tokenizer.texts_to_sequences(X_test)
+
+
+
+
+# Max Len in X_train_sequences
+maxlen = max(len(tokens) for tokens in X_train_sequences)
+print("Maximum sequence length (maxlen):", maxlen)
+
+
+
+# Perform padding on X_train and X_test sequences
+X_train_padded = pad_sequences(X_train_sequences, maxlen=maxlen, padding='post',)
+X_test_padded = pad_sequences(X_test_sequences, maxlen=maxlen, padding='post')
+
+# Print the padded sequences for X_train and X_test
+print("X_train_padded:")
+print(X_train_padded)
+print("\nX_test_padded:")
+print(X_test_padded)
+
+
+# Embedding Input Size / Vocabulary Size 
+input_Size = np.max(X_train_padded) + 1
+input_Size
+
+
+
+# Define the model
+model = Sequential()
+
+# Add embedding layer
+model.add(Embedding(input_dim=input_Size, output_dim=50, input_length=maxlen))
+
+# Dropout
+model.add(Dropout(0.5))
+
+# Add Bidirectional LSTM layer
+model.add(Bidirectional(GRU(120, return_sequences=True)))
+model.add(Bidirectional(GRU(64, return_sequences=True)))
+
+#Batch Normalization
+model.add(BatchNormalization())
+
+# Add Bidirectional GRU layer
+model.add(Bidirectional(GRU(64)))
+
+# Add output layer
+model.add(Dense(6, activation='softmax'))
+
+# Compile the model
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+
+# Print model summary
+model.summary()
+
+# Model Train 
+history = model.fit(X_train_padded, y_train, epochs=5, batch_size=1500, validation_data=(X_test_padded, y_test))
+
+
+
+
