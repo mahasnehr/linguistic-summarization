@@ -322,6 +322,17 @@ axs[1].legend()
 plt.tight_layout()
 plt.show()
 
+# Evaluate Test Data 
+model.evaluate(X_test_padded, y_test)
+
+# Predictions On Test For Confustion Matrix 
+from sklearn.metrics import confusion_matrix
+y_pred = model.predict(X_test_padded)
+y_pred = np.argmax(y_pred, axis=1)
+
+cm = confusion_matrix(y_test, y_pred)
+sns.heatmap(cm, annot=True, fmt='d', cmap='Reds')
+
 
 
 
