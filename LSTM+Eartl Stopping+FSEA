@@ -1,0 +1,385 @@
+# IMPORTANT: RUN THIS CELL IN ORDER TO IMPORT YOUR KAGGLE DATA SOURCES,
+# THEN FEEL FREE TO DELETE THIS CELL.
+# NOTE: THIS NOTEBOOK ENVIRONMENT DIFFERS FROM KAGGLE'S PYTHON
+# ENVIRONMENT SO THERE MAY BE MISSING LIBRARIES USED BY YOUR
+# NOTEBOOK.
+import kagglehub
+rtatman_glove_global_vectors_for_word_representation_path = kagglehub.dataset_download('rtatman/glove-global-vectors-for-word-representation')
+praveengovi_emotions_dataset_for_nlp_path = kagglehub.dataset_download('praveengovi/emotions-dataset-for-nlp')
+pashupatigupta_emotion_detection_from_text_path = kagglehub.dataset_download('pashupatigupta/emotion-detection-from-text')
+
+print('Data source import complete.')
+
+
+import re
+import nltk
+import string
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+from nltk.corpus import stopwords
+from nltk.stem import SnowballStemmer, WordNetLemmatizer
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+
+from tensorflow.keras.utils import to_categorical
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.layers import Dense, LSTM, Embedding, Bidirectional
+
+nltk.download("stopwords")
+stop_words = set(stopwords.words("english"))
+lemmatizer= WordNetLemmatizer()
+
+# Modelling
+from sklearn.model_selection import train_test_split,KFold, GridSearchCV
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score,confusion_matrix, classification_report
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import f1_score
+from sklearn.svm import SVC
+
+#Lime
+!pip install lime
+from lime import lime_text
+from lime.lime_text import LimeTextExplainer
+from lime.lime_text import IndexedString,IndexedCharacters
+from lime.lime_base import LimeBase
+from lime.lime_text import explanation
+sns.set(font_scale=1.3)
+nltk.download('omw-1.4')
+nltk.download('wordnet')
+
+
+# Read datasets
+df_train = pd.read_csv('train.txt', names=['Text', 'Emotion'], sep=';')
+df_val = pd.read_csv('val.txt', names=['Text', 'Emotion'], sep=';')
+df_test = pd.read_csv('test.txt', names=['Text', 'Emotion'], sep=';')
+
+# After loading, the first row of each dataframe contains headers as data. Remove them.
+df_train = df_train.iloc[1:].copy()
+df_val = df_val.iloc[1:].copy()
+df_test = df_test.iloc[1:].copy()
+
+# Convert 'Emotion' columns to numeric type
+df_train['Emotion'] = pd.to_numeric(df_train['Emotion'])
+df_val['Emotion'] = pd.to_numeric(df_val['Emotion'])
+df_test['Emotion'] = pd.to_numeric(df_test['Emotion'])
+
+
+
+
+#print the shape of the data set
+print(df_train.shape)
+
+#print first 5 rows
+df_test.head()
+
+
+#print first 5 rows
+df_train.head()
+
+
+from google.colab import sheets
+from google.colab import auth
+auth.authenticate_user()
+sheet = sheets.InteractiveSheet(df=df_train)
+
+
+#check if the data is balanced or not
+df_train.Emotion.value_counts() / df_train.shape[0] *100
+
+
+
+#check if the data is balanced or not
+df_train.Emotion.value_counts()
+
+
+#print the shape of the data set
+print(df_test.shape)
+
+
+#print first 5 rows
+df_val.head()
+
+
+#print the shape of the data set
+print(df_val.shape)
+
+
+#check if the data is balanced or not
+df_train.Emotion.value_counts()
+
+#check if the data is balanced or not
+df_train.Emotion.value_counts() / df_train.shape[0] *100
+
+
+plt.figure(figsize=(8,4))
+sns.countplot(x='Emotion', data=df_train);
+
+
+#print the number of null values in each column
+df_train.isnull().sum()
+
+
+#removing duplicated values
+index = df_train[df_train.duplicated() == True].index
+df_train.drop(index, axis = 0, inplace = True)
+df_train.reset_index(inplace=True, drop = True)
+
+#print the rows which are duplicated (duplicated in the text but with different emotions)
+df_train[df_train['Text'].duplicated() == True]
+
+#print some of those rows to check
+df_train[df_train['Text'] == df_train.iloc[40]['Text']]
+
+
+df_train[df_train['Text'] == df_train.iloc[143]['Text']]
+
+
+df_train[df_train['Text'] == df_train.iloc[179]['Text']]
+
+#removing duplicated text
+index = df_train[df_train['Text'].duplicated() == True].index
+df_train.drop(index, axis = 0, inplace = True)
+df_train.reset_index(inplace=True, drop = True)
+
+
+
+#Count the number of stopwords in the data
+temp =df_train.copy()
+stop_words = set(stopwords.words("english"))
+temp['stop_words'] = temp['Text'].apply(lambda x: len(set(x.split()) & set(stop_words)))
+temp.stop_words.value_counts()
+
+
+#distribution of stopwords visually
+temp['stop_words'].plot(kind= 'hist')
+
+
+
+#check if the data is balanced or not
+df_test.Emotion.value_counts()
+
+plt.figure(figsize=(8,4))
+sns.countplot(x='Emotion', data=df_test);
+
+
+
+#print the number of null values in each column
+df_test.isnull().sum()
+
+#print the number of duplicated values
+df_test.duplicated().sum()
+
+#print the rows which are duplicated
+df_test[df_test['Text'].duplicated() == True]
+
+
+
+#Count the number of stopwords in the data
+temp =df_test.copy()
+temp['stop_words'] = temp['Text'].apply(lambda x: len(set(x.split()) & set(stop_words)))
+temp.stop_words.value_counts()
+
+
+sns.set(font_scale=1.3)
+temp['stop_words'].plot(kind= 'hist')
+
+#check if the data is balanced or not
+df_val.Emotion.value_counts()
+
+plt.figure(figsize=(8,4))
+sns.countplot(x='Emotion', data=df_val);
+
+#print the number of null values in each column
+df_val.isnull().sum()
+
+#print the number of duplicated values
+df_val.duplicated().sum()
+#print the rows which are duplicated
+df_val[df_val['Text'].duplicated() == True]
+
+df_val[df_val['Text'] == df_val.iloc[603]['Text']]
+
+
+df_val[df_val['Text'] == df_val.iloc[1993]['Text']]
+
+#removing duplicated text
+index = df_val[df_val['Text'].duplicated() == True].index
+df_val.drop(index, axis = 0, inplace = True)
+df_val.reset_index(inplace=True, drop = True)
+
+#Count the number of stopwords in the data
+temp =df_val.copy()
+temp['stop_words'] = temp['Text'].apply(lambda x: len(set(x.split()) & set(stop_words)))
+temp.stop_words.value_counts()[:10]
+
+sns.set(font_scale=1.3)
+temp['stop_words'].plot(kind= 'hist');
+
+def dataframe_difference(df1, df2, which=None):
+    """Find rows which are different between two DataFrames."""
+
+    # Combine the two DataFrames using a merge operation, with the
+    # indicator parameter set to True. This adds a column called _merge
+    # to the resulting DataFrame, which indicates the source of each row.
+    comparison_df = df1.merge(
+        df2,
+        indicator=True,
+        how='outer'
+    )
+
+    # Filter the merged DataFrame based on the value of _merge. If which
+    # is not specified, return all rows where _merge is not 'both'.
+    # Otherwise, return all rows where _merge has the specified value
+    if which is None:
+        diff_df = comparison_df[comparison_df['_merge'] != 'both']
+    else:
+        diff_df = comparison_df[comparison_df['_merge'] == which]
+
+    # Return the filtered DataFrame
+    return diff_df
+
+dataframe_difference(df_train, df_test, which='both')
+
+dataframe_difference(df_train, df_val, which='both')
+dataframe_difference(df_val, df_test, which='both')
+def lemmatization(text):
+    lemmatizer= WordNetLemmatizer()
+
+    text = text.split()
+
+    text=[lemmatizer.lemmatize(y) for y in text]
+
+    return " " .join(text)
+
+def remove_stop_words(text):
+
+    Text=[i for i in str(text).split() if i not in stop_words]
+    return " ".join(Text)
+
+def Removing_numbers(text):
+    text=''.join([i for i in text if not i.isdigit()])
+    return text
+
+def lower_case(text):
+
+    text = text.split()
+
+    text=[y.lower() for y in text]
+
+    return " " .join(text)
+
+def Removing_punctuations(text):
+    ## Remove punctuations
+    text = re.sub('[%s]' % re.escape("""!"#$%&'()*+,،-./:;<=>؟?@[\]^_`{|}~"""), ' ', text)
+    text = text.replace('؛',"", )
+
+    ## remove extra whitespace
+    text = re.sub('\s+', ' ', text)
+    text =  " ".join(text.split())
+    return text.strip()
+
+def Removing_urls(text):
+    url_pattern = re.compile(r'https?://\S+|www\.\S+')
+    return url_pattern.sub(r'', text)
+
+def remove_small_sentences(df):
+    for i in range(len(df)):
+        if len(df.text.iloc[i].split()) < 3:
+            df.text.iloc[i] = np.nan
+
+def normalize_text(df):
+    df.Text=df.Text.apply(lambda text : lower_case(text))
+    df.Text=df.Text.apply(lambda text : remove_stop_words(text))
+    df.Text=df.Text.apply(lambda text : Removing_numbers(text))
+    df.Text=df.Text.apply(lambda text : Removing_punctuations(text))
+    df.Text=df.Text.apply(lambda text : Removing_urls(text))
+    df.Text=df.Text.apply(lambda text : lemmatization(text))
+    return df
+
+def normalized_sentence(sentence):
+    sentence= lower_case(sentence)
+    sentence= remove_stop_words(sentence)
+    sentence= Removing_numbers(sentence)
+    sentence= Removing_punctuations(sentence)
+    sentence= Removing_urls(sentence)
+    sentence= lemmatization(sentence)
+    return sentence
+
+
+
+df_train= normalize_text(df_train)
+df_test= normalize_text(df_test)
+df_val= normalize_text(df_val)
+plt.figure(figsize=(8,4))
+sns.countplot(x='Emotion', data=df_train);
+
+plt.figure(figsize=(8,4))
+sns.countplot(x='Emotion', data=df_train);
+
+#Preprocess text
+X_train = df_train['Text'].values
+y_train = df_train['Emotion'].values
+
+X_test = df_test['Text'].values
+y_test = df_test['Emotion'].values
+
+X_val = df_val['Text'].values
+y_val = df_val['Emotion'].values
+
+print(f"First 5 elements of y_train: {y_train[:5]}")
+print(f"Data type of y_train: {y_train.dtype}")
+
+def train_model(model, data, targets):
+    """
+    Train a model on the given data and targets.
+
+    Parameters:
+    model (sklearn model): The model to be trained.
+    data (list of str): The input data.
+    targets (list of str): The targets.
+
+    Returns:
+    Pipeline: The trained model as a Pipeline object.
+    """
+    # Create a Pipeline object with a TfidfVectorizer and the given model
+    text_clf = Pipeline([('vect',TfidfVectorizer()),
+                         ('clf', model)])
+    # Fit the model on the data and targets
+    text_clf.fit(data, targets)
+    return text_clf
+def get_F1(trained_model,X,y):
+    """
+    Get the F1 score for the given model on the given data and targets.
+
+    Parameters:
+    trained_model (sklearn model): The trained model.
+    X (list of str): The input data.
+    y (list of str): The targets.
+
+    Returns:
+    array: The F1 score for each class.
+    """
+    # Make predictions on the input data using the trained model
+    predicted=trained_model.predict(X)
+    # Calculate the F1 score for the predictions
+    f1=f1_score(y,predicted, average=None)
+    # Return the F1 score
+    return f1
+#Train the model with the training data
+log_reg = train_model(LogisticRegression(solver='liblinear',random_state = 0), X_train, y_train)
+
+
+
