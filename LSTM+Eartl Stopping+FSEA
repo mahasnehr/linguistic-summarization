@@ -380,6 +380,576 @@ def get_F1(trained_model,X,y):
     return f1
 #Train the model with the training data
 log_reg = train_model(LogisticRegression(solver='liblinear',random_state = 0), X_train, y_train)
+#Make a single prediction
+y_pred=log_reg.predict(['Happy'])
+y_pred
+#test the model with the test data
+y_pred=log_reg.predict(X_test)
+
+#calculate the accuracy
+log_reg_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', log_reg_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(log_reg,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+##Classification Report
+print(classification_report(y_test, y_pred))
+
+#Train the model with the training data
+DT = train_model(DecisionTreeClassifier(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=DT.predict(X_test)
+
+#calculate the accuracy
+DT_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', DT_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(DT,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+
+##Classification Report
+print(classification_report(y_test, y_pred))
+#Train the model with the training data
+SVM = train_model(SVC(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=SVM.predict(X_test)
+
+#calculate the accuracy
+SVM_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', SVM_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(SVM,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+
+##Classification Report
+print(classification_report(y_test, y_pred))
+
+#Train the model with the training data
+RF = train_model(RandomForestClassifier(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=RF.predict(X_test)
+
+#calculate the accuracy
+RF_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', RF_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(RF, X_test, y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+##Classification Report
+print(classification_report(y_test, y_pred))
+
+models = pd.DataFrame({
+    'Model': ['Logistic Regression', 'Decision Tree','Support Vector Machine','Random Forest'],
+    'Accuracy': [round(log_reg_accuracy, 2), round(DT_accuracy, 2), round(SVM_accuracy, 2), round(RF_accuracy, 2)]})
+
+models.sort_values(by='Accuracy', ascending=False).reset_index().drop(['index'], axis=1)
+
+def train_model(model, data, targets):
+    """
+    Train a model on the given data and targets.
+
+    Parameters:
+    model (sklearn model): The model to be trained.
+    data (list of str): The input data.
+    targets (list of str): The targets.
+
+    Returns:
+    Pipeline: The trained model as a Pipeline object.
+    """
+    # Create a Pipeline object with a TfidfVectorizer and the given model
+    text_clf = Pipeline([('vect',TfidfVectorizer()),
+                         ('clf', model)])
+    # Fit the model on the data and targets
+    text_clf.fit(data, targets)
+    return text_clf
+
+
+def get_F1(trained_model,X,y):
+    """
+    Get the F1 score for the given model on the given data and targets.
+
+    Parameters:
+    trained_model (sklearn model): The trained model.
+    X (list of str): The input data.
+    y (list of str): The targets.
+
+    Returns:
+    array: The F1 score for each class.
+    """
+    # Make predictions on the input data using the trained model
+    predicted=trained_model.predict(X)
+    # Calculate the F1 score for the predictions
+    f1=f1_score(y,predicted, average=None)
+    # Return the F1 score
+    return f1
+#Train the model with the training data
+log_reg = train_model(LogisticRegression(solver='liblinear',random_state = 0), X_train, y_train)
+
+
+#test the model with the test data
+y_pred=log_reg.predict(X_test)
+
+#calculate the accuracy
+log_reg_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', log_reg_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(log_reg,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+#Train the model with the training data
+DT = train_model(DecisionTreeClassifier(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=DT.predict(X_test)
+
+#calculate the accuracy
+DT_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', DT_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(DT,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+
+#Train the model with the training data
+SVM = train_model(SVC(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=SVM.predict(X_test)
+
+#calculate the accuracy
+SVM_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', SVM_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(SVM,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+
+
+#Train the model with the training data
+DT = train_model(DecisionTreeClassifier(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=DT.predict(X_test)
+
+#calculate the accuracy
+DT_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', DT_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(DT,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+#Train the model with the training data
+SVM = train_model(SVC(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=SVM.predict(X_test)
+
+#calculate the accuracy
+SVM_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', SVM_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(SVM,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+
+
+#Train the model with the training data
+RF = train_model(RandomForestClassifier(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=RF.predict(X_test)
+
+#calculate the accuracy
+RF_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', RF_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(RF, X_test, y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+models = pd.DataFrame({
+    'Model': ['Logistic Regression', 'Decision Tree','Support Vector Machine','Random Forest'],
+    'Accuracy': [log_reg_accuracy.round(2), DT_accuracy.round(2), SVM_accuracy.round(2), RF_accuracy.round(2)]})
+
+models.sort_values(by='Accuracy', ascending=False).reset_index().drop(['index'], axis=1)
+
+
+models = pd.DataFrame({
+    'Model': ['Logistic Regression', 'Decision Tree','Support Vector Machine','Random Forest'],
+    'Accuracy': [log_reg_accuracy.round(2), DT_accuracy.round(2), SVM_accuracy.round(2), RF_accuracy.round(2)]})
+
+models.sort_values(by='Accuracy', ascending=False).reset_index().drop(['index'], axis=1)
+
+#c_LR = make_pipeline(tfidf, clf)
+explainer_LR = LimeTextExplainer(class_names=RF.classes_)
+idx  = 15
+print("Actual Text : ", X_test[idx])
+print("Prediction : ", RF.predict(X_test)[idx])
+print("Actual :     ", y_test[idx])
+exp = explainer_LR.explain_instance(X_test[idx], RF.predict_proba,top_labels=5)
+exp.show_in_notebook()
+
+
+#Splitting the text from the labels
+X_train = df_train['Text']
+y_train = df_train['Emotion']
+
+X_test = df_test['Text']
+y_test = df_test['Emotion']
+
+X_val = df_val['Text']
+y_val = df_val['Emotion']
+
+
+# Encode labels
+le = LabelEncoder()
+y_train = le.fit_transform(y_train)
+y_test = le.transform(y_test)
+y_val = le.transform(y_val)
+
+#Train the model with the training data
+log_reg = train_model(LogisticRegression(solver='liblinear',random_state = 0), X_train, y_train)
+
+
+
+#test the model with the test data
+y_pred=log_reg.predict(X_test)
+
+#calculate the accuracy
+log_reg_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', log_reg_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(log_reg,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+
+#Train the model with the training data
+DT = train_model(DecisionTreeClassifier(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=DT.predict(X_test)
+
+#calculate the accuracy
+DT_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', DT_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(DT,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+
+#Train the model with the training data
+SVM = train_model(SVC(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=SVM.predict(X_test)
+
+#calculate the accuracy
+SVM_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', SVM_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(SVM,X_test,y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+
+#Train the model with the training data
+RF = train_model(RandomForestClassifier(random_state = 0), X_train, y_train)
+
+#test the model with the test data
+y_pred=RF.predict(X_test)
+
+#calculate the accuracy
+RF_accuracy = accuracy_score(y_test, y_pred)
+print('Accuracy: ', RF_accuracy,'\n')
+
+#calculate the F1 score
+f1_Score = get_F1(RF, X_test, y_test)
+pd.DataFrame(f1_Score, index=df_train.Emotion.unique(), columns=['F1 score'])
+
+
+#c_LR = make_pipeline(tfidf, clf)
+explainer_LR = LimeTextExplainer(class_names=RF.classes_)
+idx  = 15
+print("Actual Text : ", X_test[idx])
+print("Prediction : ", RF.predict(X_test)[idx])
+print("Actual :     ", y_test[idx])
+exp = explainer_LR.explain_instance(X_test[idx], RF.predict_proba,top_labels=5)
+exp.show_in_notebook()
+
+
+def train_model(model, data, targets):
+    """
+    Train a model on the given data and targets.
+
+    Parameters:
+    model (sklearn model): The model to be trained.
+    data (list of str): The input data.
+    targets (list of str): The targets.
+
+    Returns:
+    Pipeline: The trained model as a Pipeline object.
+    """
+    # Create a Pipeline object with a TfidfVectorizer and the given model
+    text_clf = Pipeline([('vect',TfidfVectorizer()),
+                         ('clf', model)])
+    # Fit the model on the data and targets
+    text_clf.fit(data, targets)
+    return text_clf
+
+def get_F1(trained_model,X,y):
+    """
+    Get the F1 score for the given model on the given data and targets.
+
+    Parameters:
+    trained_model (sklearn model): The trained model.
+    X (list of str): The input data.
+    y (list of str): The targets.
+
+    Returns:
+    array: The F1 score for each class.
+    """
+    # Make predictions on the input data using the trained model
+    predicted=trained_model.predict(X)
+    # Calculate the F1 score for the predictions
+    f1=f1_score(y,predicted, average=None)
+    # Return the F1 score
+    return f1
+
+
+#Splitting the text from the labels
+X_train = df_train['Text']
+y_train = df_train['Emotion']
+
+X_test = df_test['Text']
+y_test = df_test['Emotion']
+
+X_val = df_val['Text']
+y_val = df_val['Emotion']
+# Encode labels
+le = LabelEncoder()
+y_train = le.fit_transform(y_train)
+y_test = le.transform(y_test)
+y_val = le.transform(y_val)
+
+#print the labels after encoding
+print(set(y_train))
+
+
+#Convert the class vector (integers) to binary class matrix
+y_train = to_categorical(y_train)
+y_test = to_categorical(y_test)
+y_val = to_categorical(y_val)
+
+
+print(y_train)
+
+
+# Tokenize words
+tokenizer = Tokenizer(oov_token='UNK')
+tokenizer.fit_on_texts(pd.concat([X_train, X_test], axis=0))
+#document count: A dictionary of words and how many documents each appeared in.
+#in this dataset the output will be the number of rows
+tokenizer.document_count
+
+#print the index of a single word
+tokenizer.word_index['towards']
+
+#converting a single sentence to list of indexes
+tokenizer.texts_to_sequences(X_train[0].split())
+
+
+#convert the list of indexes into a matrix of ones and zeros (BOW)
+tokenizer.texts_to_matrix(X_train[0].split())
+
+#the sentence contains three words and the size of the vocabulary is 14325
+tokenizer.texts_to_matrix(X_train[0].split()).shape
+
+sequences_train = tokenizer.texts_to_sequences(X_train)
+sequences_test = tokenizer.texts_to_sequences(X_test)
+sequences_val = tokenizer.texts_to_sequences(X_val)
+
+
+df_test.shape
+maxlen = max([len(t) for t in df_train['Text']])
+maxlen
+
+X_train = pad_sequences(sequences_train, maxlen=229, truncating='pre')
+X_test = pad_sequences(sequences_test, maxlen=229, truncating='pre')
+X_val = pad_sequences(sequences_val, maxlen=229, truncating='pre')
+
+vocabSize = len(tokenizer.index_word) + 1
+print(f"Vocabulary size = {vocabSize}")
+
+#before
+sequences_train[0]
+
+#after
+X_train[0]
+
+import os
+
+# Read GloVE embeddings
+
+path_to_glove_file = os.path.join(rtatman_glove_global_vectors_for_word_representation_path, 'glove.6B.200d.txt')
+num_tokens = vocabSize
+embedding_dim = 200 #latent factors or features
+hits = 0
+misses = 0
+embeddings_index = {}
+
+# Read word vectors
+with open(path_to_glove_file) as f:
+    for line in f:
+        word, coefs = line.split(maxsplit=1)
+        coefs = np.fromstring(coefs, "f", sep=" ")
+        embeddings_index[word] = coefs
+print("Found %s word vectors." % len(embeddings_index))
+
+# Assign word vectors to our dictionary/vocabulary
+embedding_matrix = np.zeros((num_tokens, embedding_dim))
+for word, i in tokenizer.word_index.items():
+    embedding_vector = embeddings_index.get(word)
+    if embedding_vector is not None:
+        # Words not found in embedding index will be all-zeros.
+        # This includes the representation for "padding" and "OOV"
+        embedding_matrix[i] = embedding_vector
+        hits += 1
+    else:
+        misses += 1
+print("Converted %d words (%d misses)" % (hits, misses))
+
+
+# Build neural network architecture
+
+adam = Adam(learning_rate=0.005)
+
+model = Sequential()
+model.add(Embedding(vocabSize, 200, input_length=X_train.shape[1], weights=[embedding_matrix], trainable=False))
+model.add(Bidirectional(LSTM(256, dropout=0.2,recurrent_dropout=0.2, return_sequences=True)))
+model.add(Bidirectional(LSTM(128, dropout=0.2,recurrent_dropout=0.2, return_sequences=True)))
+model.add(Bidirectional(LSTM(128, dropout=0.2,recurrent_dropout=0.2)))
+model.add(Dense(6, activation='softmax'))
+
+model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+model.summary()
+
+
+!pip install pydot graphviz
+from tensorflow.keras.utils import plot_model
+model.build(input_shape=(None, X_train.shape[1])) # Explicitly build the model with the correct input shape
+plot_model(model, show_shapes=True)
+
+
+#to stop the training when the loss starts to increase
+callback = EarlyStopping(
+    monitor="val_loss",
+    patience=4,
+    restore_best_weights=True,
+)
+
+
+
+# Fit model
+history = model.fit(X_train,
+                    y_train,
+                    validation_data=(X_val, y_val),
+                    verbose=1,
+                    batch_size=256,
+                    epochs=30,
+                    callbacks=[callback]
+                   )
+
+
+#print the overall loss and accuracy
+model.evaluate(X_val, y_val, verbose=1)
+#print the overall loss and accuracy
+model.evaluate(X_test, y_test, verbose=1)
+predicted = model.predict(X_test)
+y_pred = predicted.argmax(axis=-1)
+
+print(classification_report(le.transform(df_test['Emotion']), y_pred))
+
+
+
+# Visualize Loss & Accuracy
+
+%matplotlib inline
+import matplotlib.pyplot as plt
+acc = history.history['accuracy']
+val_acc = history.history['val_accuracy']
+loss = history.history['loss']
+val_loss = history.history['val_loss']
+
+epochs = range(len(acc))
+
+plt.plot(epochs, acc, 'r', label='Training accuracy')
+plt.plot(epochs, val_acc, 'b', label='Validation accuracy')
+plt.title('Training and validation accuracy')
+plt.legend()
+plt.figure()
+
+plt.plot(epochs, loss, 'r', label='Training Loss')
+plt.plot(epochs, val_loss, 'b', label='Validation Loss')
+plt.title('Training and validation loss')
+plt.legend()
+
+plt.show()
+
+# Classify custom sample
+
+sentences = [
+            "He's over the moon about being accepted to the university",
+            "Your point on this certain matter made me outrageous, how can you say so? This is insane.",
+            "I can't do it, I'm not ready to lose anything, just leave me alone",
+            "Merlin's beard harry, you can cast the Patronus charm! I'm amazed!"
+            ]
+for sentence in sentences:
+    print(sentence)
+    sentence = normalized_sentence(sentence)
+    sentence = tokenizer.texts_to_sequences([sentence])
+    sentence = pad_sequences(sentence, maxlen=229, truncating='pre')
+    result = le.inverse_transform(np.argmax(model.predict(sentence), axis=-1))[0]
+    proba =  np.max(model.predict(sentence))
+    print(f"{result} : {proba}\n\n")
+
+
+
+sentence= 'my old brother is dead'
+print(sentence)
+sentence = normalized_sentence(sentence)
+sentence = tokenizer.texts_to_sequences([sentence])
+sentence = pad_sequences(sentence, maxlen=229, truncating='pre')
+result = le.inverse_transform(np.argmax(model.predict(sentence), axis=-1))[0]
+proba =  np.max(model.predict(sentence))
+print(f"{result} : {proba}\n\n")
+
+
+sentence= 'Im feeling sad today'
+print(sentence)
+sentence = normalized_sentence(sentence)
+sentence = tokenizer.texts_to_sequences([sentence])
+sentence = pad_sequences(sentence, maxlen=229, truncating='pre')
+result = le.inverse_transform(np.argmax(model.predict(sentence), axis=-1))[0]
+proba =  np.max(model.predict(sentence))
+print(f"{result} : {proba}\n\n")
+
+
+model.save('Emotion Recognition From English text.h5')
 
 
 
