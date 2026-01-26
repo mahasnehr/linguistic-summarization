@@ -1348,3 +1348,22 @@ def plutchik(scores,
         ax.set_title(title, fontfamily = font, fontsize = title_size, fontweight = 'bold', pad = 20)
 
     return ax
+
+
+
+emotions_simple = {
+      'x11': 0,
+      'x12': 0.9,
+      'x13': 1,
+      'x21': 1,
+      'x22': 0,
+      'x23': 1,
+      'anger': 0,
+      'anticipation': 0
+      }
+plutchik(scores=emotions_simple) # scores = emotions_simple
+
+
+
+
+
